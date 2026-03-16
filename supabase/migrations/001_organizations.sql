@@ -81,8 +81,8 @@ create policy "Users can add themselves as owner of new org"
     )
   );
 
--- Updated_at trigger
-create or replace function public.handle_updated_at()
+-- Shared updated_at trigger function (used by all tables)
+create or replace function public.update_updated_at()
 returns trigger as $$
 begin
   new.updated_at = now();
@@ -92,4 +92,4 @@ $$ language plpgsql;
 
 create trigger on_organizations_updated
   before update on public.organizations
-  for each row execute function public.handle_updated_at();
+  for each row execute function public.update_updated_at();
