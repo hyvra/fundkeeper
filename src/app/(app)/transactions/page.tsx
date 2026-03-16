@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -10,16 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-const CATEGORY_COLORS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  buy: 'default',
-  sell: 'destructive',
-  transfer_in: 'secondary',
-  transfer_out: 'secondary',
-  staking_reward: 'default',
-  fee: 'outline',
-  unknown: 'outline',
-}
+import { AutoCategorizeButton } from '@/components/transactions/auto-categorize-button'
+import { CategoryEditor } from '@/components/transactions/category-editor'
 
 export default async function TransactionsPage() {
   const supabase = await createClient()
@@ -45,9 +36,12 @@ export default async function TransactionsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-        <p className="text-muted-foreground">All synced transactions across your connections.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
+          <p className="text-muted-foreground">All synced transactions across your connections.</p>
+        </div>
+        <AutoCategorizeButton />
       </div>
 
       {(!transactions || transactions.length === 0) ? (
@@ -83,9 +77,7 @@ export default async function TransactionsPage() {
                       {new Date(tx.timestamp).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={CATEGORY_COLORS[tx.category] ?? 'outline'}>
-                        {tx.category.replace('_', ' ')}
-                      </Badge>
+                      <CategoryEditor transactionId={tx.id} currentCategory={tx.category} />
                     </TableCell>
                     <TableCell className="font-medium">{tx.asset}</TableCell>
                     <TableCell className="text-right font-mono text-sm">
