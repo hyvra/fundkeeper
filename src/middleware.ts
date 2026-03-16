@@ -51,29 +51,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect to onboarding if not completed (skip for /onboarding and /api routes)
-  if (user && isAppRoute && !request.nextUrl.pathname.startsWith('/onboarding')) {
-    const { data: membership } = await supabase
-      .from('org_members')
-      .select('org_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (membership) {
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('onboarding_completed_at')
-        .eq('id', membership.org_id)
-        .single()
-
-      if (org && !org.onboarding_completed_at) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding'
-        return NextResponse.redirect(url)
-      }
-    }
-  }
-
   return supabaseResponse
 }
 

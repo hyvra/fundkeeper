@@ -14,6 +14,25 @@ export default async function AppLayout({
     redirect('/login')
   }
 
+  // Check onboarding status — redirect new users to onboarding
+  const { data: membership } = await supabase
+    .from('org_members')
+    .select('org_id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (membership) {
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('onboarding_completed_at')
+      .eq('id', membership.org_id)
+      .single()
+
+    if (org && !org.onboarding_completed_at) {
+      redirect('/onboarding')
+    }
+  }
+
   return (
     <div className="flex h-screen">
       <Sidebar />
