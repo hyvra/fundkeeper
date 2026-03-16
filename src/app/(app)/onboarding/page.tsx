@@ -40,7 +40,6 @@ const CHAINS = [
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(0)
-  const router = useRouter()
 
   function goNext() {
     setStep((s) => Math.min(s + 1, STEPS.length - 1))

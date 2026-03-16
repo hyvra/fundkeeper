@@ -35,7 +35,8 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/reconciliation') ||
     request.nextUrl.pathname.startsWith('/reports') ||
     request.nextUrl.pathname.startsWith('/exports') ||
-    request.nextUrl.pathname.startsWith('/settings')
+    request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/onboarding')
 
   if (!user && isAppRoute) {
     const url = request.nextUrl.clone()
@@ -48,6 +49,29 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
+  }
+
+  // Redirect to onboarding if not completed (skip for /onboarding and /api routes)
+  if (user && isAppRoute && !request.nextUrl.pathname.startsWith('/onboarding')) {
+    const { data: membership } = await supabase
+      .from('org_members')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (membership) {
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('onboarding_completed_at')
+        .eq('id', membership.org_id)
+        .single()
+
+      if (org && !org.onboarding_completed_at) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/onboarding'
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   return supabaseResponse
