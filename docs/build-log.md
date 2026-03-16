@@ -111,4 +111,24 @@
 - **Phases 1-7 complete**
 
 ### Next up
-- Phase 8: Polish — dashboard data, cron sync, error handling, landing page, onboarding
+- Phase 8: Polish — dashboard data, cron sync, error handling, landing page
+
+## 2026-03-16 — Onboarding Flow
+
+### What was built
+- Migration 007: `onboarding_completed_at` column on organizations table
+- API route: POST /api/onboarding/complete (marks org onboarding done)
+- Multi-step onboarding wizard at /onboarding (Welcome > Connect > Sync > Done)
+  - Reuses existing exchange/wallet API routes
+  - Step indicator with progress visualization
+  - Skip links on connect and sync steps
+  - Calls POST /api/onboarding/complete on finish
+- Middleware redirect: authenticated users with null `onboarding_completed_at` are redirected to /onboarding (avoids loop by skipping redirect when already on /onboarding)
+
+### Files created
+- `supabase/migrations/007_onboarding.sql`
+- `src/app/api/onboarding/complete/route.ts`
+- `src/app/(app)/onboarding/page.tsx`
+
+### Files modified
+- `src/middleware.ts` (onboarding redirect + /onboarding in protected routes)
