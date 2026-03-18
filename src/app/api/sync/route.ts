@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
         .from('exchange_connections')
         .select('*')
         .eq('org_id', membership.org_id)
-        .eq('status', 'active'),
+        .in('status', ['active', 'pending']),
       supabase
         .from('wallet_connections')
         .select('*')
         .eq('org_id', membership.org_id)
-        .eq('status', 'active'),
+        .in('status', ['active', 'pending']),
     ])
 
     let totalImported = 0
