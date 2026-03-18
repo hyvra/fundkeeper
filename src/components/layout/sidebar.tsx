@@ -58,8 +58,11 @@ function SidebarContent({
   return (
     <>
       <div className="flex h-14 items-center border-b px-4">
-        <Link href="/dashboard" className="text-lg font-bold" onClick={onNavClick}>
-          Fundkeeper
+        <Link href="/dashboard" className="flex items-center gap-2" onClick={onNavClick}>
+          <div className="flex size-7 items-center justify-center rounded-md bg-gradient-to-br from-emerald-400 to-cyan-400">
+            <span className="text-sm font-bold text-[#09090b]">F</span>
+          </div>
+          <span className="text-lg font-semibold tracking-tight">Fundkeeper</span>
         </Link>
       </div>
       <nav className="flex-1 space-y-1 p-2">
@@ -74,7 +77,7 @@ function SidebarContent({
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground border-l-2 border-emerald-400'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
               )}
             >

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { AddExchangeDialog } from '@/components/connections/add-exchange-dialog'
@@ -18,11 +19,11 @@ const CHAIN_LABELS: Record<string, string> = {
   solana: 'Solana',
 }
 
-const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  active: 'default',
-  pending: 'secondary',
-  error: 'destructive',
-  disabled: 'outline',
+const STATUS_CLASSES: Record<string, string> = {
+  active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  pending: '',
+  error: 'bg-red-500/10 text-red-400 border-red-500/20',
+  disabled: '',
 }
 
 export default async function ConnectionsPage() {
@@ -83,7 +84,10 @@ export default async function ConnectionsPage() {
                   <CardTitle className="text-base font-medium">
                     {EXCHANGE_LABELS[conn.exchange] ?? conn.exchange}
                   </CardTitle>
-                  <Badge variant={STATUS_VARIANTS[conn.status] ?? 'secondary'}>
+                  <Badge
+                    variant={conn.status === 'pending' ? 'secondary' : conn.status === 'disabled' ? 'outline' : 'outline'}
+                    className={cn(STATUS_CLASSES[conn.status])}
+                  >
                     {conn.status}
                   </Badge>
                 </CardHeader>
@@ -114,7 +118,10 @@ export default async function ConnectionsPage() {
                   <CardTitle className="text-base font-medium">
                     {CHAIN_LABELS[conn.chain] ?? conn.chain}
                   </CardTitle>
-                  <Badge variant={STATUS_VARIANTS[conn.status] ?? 'secondary'}>
+                  <Badge
+                    variant={conn.status === 'pending' ? 'secondary' : conn.status === 'disabled' ? 'outline' : 'outline'}
+                    className={cn(STATUS_CLASSES[conn.status])}
+                  >
                     {conn.status}
                   </Badge>
                 </CardHeader>

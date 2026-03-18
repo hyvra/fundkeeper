@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -133,65 +134,77 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="group transition-colors hover:border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Asset Value
             </CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <Wallet className="h-4 w-4 text-emerald-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">
-              {totalAssetValue > 0
-                ? `$${totalAssetValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                : '--'}
-            </p>
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-0.5 rounded-full bg-emerald-400" />
+              <p className="text-3xl font-bold tracking-tight">
+                {totalAssetValue > 0
+                  ? `$${totalAssetValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : '--'}
+              </p>
+            </div>
             {(openLots?.length ?? 0) > 0 && (
-              <p className="text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground">
                 {openLots!.length.toLocaleString()} open lots
               </p>
             )}
           </CardContent>
         </Card>
-        <Card>
+        <Card className="group transition-colors hover:border-cyan-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Connections
             </CardTitle>
-            <Link className="h-4 w-4 text-muted-foreground" />
+            <Link className="h-4 w-4 text-cyan-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{connectionCount.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-0.5 rounded-full bg-cyan-400" />
+              <p className="text-3xl font-bold tracking-tight">{connectionCount.toLocaleString()}</p>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {(exchanges?.length ?? 0)} exchange{(exchanges?.length ?? 0) !== 1 ? 's' : ''},{' '}
               {(wallets?.length ?? 0)} wallet{(wallets?.length ?? 0) !== 1 ? 's' : ''}
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="group transition-colors hover:border-emerald-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Transactions
             </CardTitle>
-            <ArrowRightLeft className="h-4 w-4 text-muted-foreground" />
+            <ArrowRightLeft className="h-4 w-4 text-emerald-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{(transactionCount ?? 0).toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-0.5 rounded-full bg-emerald-400" />
+              <p className="text-3xl font-bold tracking-tight">{(transactionCount ?? 0).toLocaleString()}</p>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
               total synced
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="group transition-colors hover:border-amber-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Uncategorized
             </CardTitle>
-            <CircleAlert className="h-4 w-4 text-muted-foreground" />
+            <CircleAlert className="h-4 w-4 text-amber-400" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{(uncategorizedCount ?? 0).toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-0.5 rounded-full bg-amber-400" />
+              <p className="text-3xl font-bold tracking-tight">{(uncategorizedCount ?? 0).toLocaleString()}</p>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
               need review
             </p>
           </CardContent>
@@ -209,7 +222,7 @@ export default async function DashboardPage() {
               {checklist.map((item) => (
                 <li key={item.label} className="flex items-center gap-3 text-sm">
                   {item.done ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                    <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
                   )}
@@ -248,7 +261,18 @@ export default async function DashboardPage() {
                       {new Date(tx.timestamp).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={tx.category === 'unknown' ? 'outline' : 'secondary'}>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'border-transparent',
+                          tx.category === 'buy' && 'bg-emerald-500/10 text-emerald-400',
+                          tx.category === 'sell' && 'bg-red-500/10 text-red-400',
+                          (tx.category === 'transfer_in' || tx.category === 'transfer_out') && 'bg-cyan-500/10 text-cyan-400',
+                          tx.category === 'staking_reward' && 'bg-purple-500/10 text-purple-400',
+                          tx.category === 'unknown' && 'border-border text-muted-foreground',
+                          !['buy', 'sell', 'transfer_in', 'transfer_out', 'staking_reward', 'unknown'].includes(tx.category) && 'bg-secondary text-secondary-foreground',
+                        )}
+                      >
                         {tx.category}
                       </Badge>
                     </TableCell>
