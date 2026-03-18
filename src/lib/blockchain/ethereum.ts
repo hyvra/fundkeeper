@@ -1,6 +1,10 @@
 import { ChainAdapter, ChainTransaction, ChainBalance } from '@/types/blockchain'
 
-const ETHERSCAN_API = 'https://api.etherscan.io/api'
+// Blockscout: free, no API key required, Etherscan-compatible response format
+const BLOCKSCOUT_API = 'https://eth.blockscout.com/api'
+
+// Free public Ethereum RPC for balance queries
+const ETH_RPC = 'https://eth.drpc.org'
 
 export class EthereumAdapter implements ChainAdapter {
   chain = 'ethereum' as const
@@ -21,16 +25,24 @@ export class EthereumAdapter implements ChainAdapter {
       sort: 'desc',
     })
 
-    const res = await fetch(`${ETHERSCAN_API}?${params}`)
-    if (!res.ok) throw new Error(`Etherscan error: ${res.status}`)
+    const res = await fetch(`${BLOCKSCOUT_API}?${params}`)
+    if (!res.ok) throw new Error(`Blockscout API returned ${res.status}`)
     const data = await res.json()
 
-    if (data.status !== '1' || !data.result?.length) {
+    if (data.message === 'No transactions found') {
+      return { transactions: [] }
+    }
+
+    if (data.message !== 'OK' || !Array.isArray(data.result)) {
+      throw new Error(`Blockscout error: ${data.message ?? data.result ?? 'Unknown error'}`)
+    }
+
+    if (data.result.length === 0) {
       return { transactions: [] }
     }
 
     const transactions: ChainTransaction[] = data.result.map((tx: Record<string, string>) => {
-      const isIncoming = tx.to.toLowerCase() === address.toLowerCase()
+      const isIncoming = tx.to?.toLowerCase() === address.toLowerCase()
       return {
         txHash: tx.hash,
         timestamp: new Date(Number(tx.timeStamp) * 1000),
@@ -52,20 +64,23 @@ export class EthereumAdapter implements ChainAdapter {
   }
 
   async fetchBalance(address: string): Promise<ChainBalance[]> {
-    const params = new URLSearchParams({
-      module: 'account',
-      action: 'balance',
-      address,
-      tag: 'latest',
+    const res = await fetch(ETH_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_getBalance',
+        params: [address, 'latest'],
+      }),
     })
-
-    const res = await fetch(`${ETHERSCAN_API}?${params}`)
-    if (!res.ok) throw new Error(`Etherscan balance error: ${res.status}`)
+    if (!res.ok) throw new Error(`ETH RPC error: ${res.status}`)
     const data = await res.json()
+    if (data.error) throw new Error(`ETH RPC: ${data.error.message}`)
 
     return [{
       asset: 'ETH',
-      balance: Number(data.result) / 1e18,
+      balance: parseInt(data.result, 16) / 1e18,
     }]
   }
 }
