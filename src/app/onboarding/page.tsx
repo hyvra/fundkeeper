@@ -439,6 +439,7 @@ function SyncStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }
       const res = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
       })
 
       if (!res.ok) {
