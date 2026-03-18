@@ -10,7 +10,7 @@ export default async function Image() {
     (
       <div
         style={{
-          background: '#171717',
+          background: '#09090b',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -18,13 +18,39 @@ export default async function Image() {
           alignItems: 'center',
           justifyContent: 'center',
           fontFamily: 'system-ui, sans-serif',
+          position: 'relative',
         }}
       >
-        <div style={{ fontSize: 72, fontWeight: 700, color: 'white', marginBottom: 16 }}>
-          Fundkeeper
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            marginBottom: '24px',
+          }}
+        >
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #34d399, #22d3ee)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+              fontWeight: 800,
+              color: '#09090b',
+            }}
+          >
+            F
+          </div>
+          <div style={{ fontSize: 48, fontWeight: 700, color: 'white', display: 'flex' }}>
+            Fundkeeper
+          </div>
         </div>
-        <div style={{ fontSize: 28, color: '#a3a3a3' }}>
-          Crypto fund accounting that doesn't suck.
+        <div style={{ fontSize: 28, color: '#71717a', display: 'flex' }}>
+          Your fund&apos;s books. Done.
         </div>
       </div>
     ),
