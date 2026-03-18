@@ -49,7 +49,7 @@ const features = [
     icon: FileSpreadsheet,
     title: 'GL Export',
     description:
-      'Map to your chart of accounts and push journal entries straight to QuickBooks or Xero. No re-keying.',
+      'Map to your chart of accounts and export journal entries as CSV for QuickBooks or Xero. No re-keying.',
   },
 ]
 

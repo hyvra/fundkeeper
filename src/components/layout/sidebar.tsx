@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -14,11 +15,18 @@ import {
   LogOut,
   Sun,
   Moon,
+  Menu,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,7 +39,11 @@ const navItems = [
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
-export function Sidebar() {
+function SidebarContent({
+  onNavClick,
+}: {
+  onNavClick?: () => void
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -44,9 +56,9 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-60 flex-col border-r bg-sidebar">
+    <>
       <div className="flex h-14 items-center border-b px-4">
-        <Link href="/dashboard" className="text-lg font-bold">
+        <Link href="/dashboard" className="text-lg font-bold" onClick={onNavClick}>
           Fundkeeper
         </Link>
       </div>
@@ -58,6 +70,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavClick}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                 isActive
@@ -89,6 +102,40 @@ export function Sidebar() {
           Sign out
         </button>
       </div>
-    </aside>
+    </>
+  )
+}
+
+export function Sidebar() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-3 left-3 z-40 md:hidden"
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      {/* Mobile sheet */}
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent side="left" className="w-60 p-0 bg-sidebar">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <div className="flex h-full flex-col">
+            <SidebarContent onNavClick={() => setOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden h-screen w-60 flex-col border-r bg-sidebar md:flex">
+        <SidebarContent />
+      </aside>
+    </>
   )
 }

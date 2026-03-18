@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Fundkeeper — Crypto Fund Back Office',
-  description: 'Self-serve back-office platform for emerging crypto fund managers. Cost basis tracking, 1099-DA reconciliation, and GL exports.',
+  description: 'Sync exchanges, track FIFO cost basis, reconcile 1099-DAs, and export to QuickBooks or Xero. Built for crypto funds in the $5-50M range.',
+  metadataBase: new URL('https://fundkeeper.vercel.app'),
 }
 
 export default function RootLayout({
