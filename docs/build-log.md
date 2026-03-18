@@ -132,3 +132,43 @@
 
 ### Files modified
 - `src/middleware.ts` (onboarding redirect + /onboarding in protected routes)
+
+## 2026-03-17 — Polish Pass
+
+### What was built
+
+**GitHub remote**
+- Repo created and pushed: `hyvra/fundkeeper`
+
+**Dark mode**
+- ThemeProvider wrapper component (`src/components/theme-provider.tsx`)
+- Root layout wrapped with ThemeProvider (attribute="class", defaultTheme="system")
+- Sun/Moon toggle in sidebar footer
+- `suppressHydrationWarning` on html element
+
+**Landing page copy rewrite**
+- Rewrote all copy to remove AI slop
+- Hero: "Your fund's books. Done."
+- Problem statement: conversational tone ("You know the drill...")
+- Feature descriptions: specific, plain-language ("Pulls trades from...", "No CSV uploads")
+- Pricing: honest beta framing ("You help us find rough edges, we give you the product free")
+
+**Settings page**
+- 4-tab settings page (Organization, Team, Appearance, Connections)
+- Organization: edit org name, view creation date and role
+- Team: member list with emails, roles, join dates (uses admin client for auth.users)
+- Appearance: light/dark/system theme cards
+- Connections: summary stats with link to /connections
+- API routes: GET/PATCH /api/settings/organization, GET /api/settings/team, GET /api/settings/connections
+
+**Supabase Vault integration**
+- Vault helper (`src/lib/supabase/vault.ts`) with storeSecret, getSecret, deleteSecret
+- Exchange connection route stores API keys in Vault, sets status to 'active'
+- Sync route retrieves keys from Vault, passes to exchange adapters
+- Wallet sync implemented (public APIs, no Vault needed)
+- Removed all 501 stubs
+
+### Status
+- **30 routes, 0 build errors**
+- **All 5 backlog items resolved**
+- **GitHub remote configured**

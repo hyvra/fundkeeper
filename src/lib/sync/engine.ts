@@ -1,16 +1,29 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { getExchangeAdapter } from '@/lib/exchanges'
+import { getChainAdapter } from '@/lib/blockchain'
 import { ExchangeCredentials, ExchangeName } from '@/types/exchange'
+import { ChainName } from '@/types/blockchain'
 import { normalizeTrade, normalizeTransfer, NormalizedTransaction } from './normalizer'
 
-interface SyncOptions {
+interface ExchangeSyncOptions {
   connectionId: string
-  connectionType: 'exchange' | 'wallet'
-  exchange?: ExchangeName
-  credentials?: ExchangeCredentials
+  connectionType: 'exchange'
+  exchange: ExchangeName
+  credentials: ExchangeCredentials
   orgId: string
   cursor?: Record<string, unknown>
 }
+
+interface WalletSyncOptions {
+  connectionId: string
+  connectionType: 'wallet'
+  chain: ChainName
+  address: string
+  orgId: string
+  cursor?: Record<string, unknown>
+}
+
+type SyncOptions = ExchangeSyncOptions | WalletSyncOptions
 
 interface SyncReport {
   tradesInserted: number
@@ -24,16 +37,21 @@ export async function syncConnection(
   supabase: SupabaseClient,
   options: SyncOptions
 ): Promise<SyncReport> {
+  if (options.connectionType === 'wallet') {
+    return syncWalletConnection(supabase, options)
+  }
+  return syncExchangeConnection(supabase, options)
+}
+
+async function syncExchangeConnection(
+  supabase: SupabaseClient,
+  options: ExchangeSyncOptions
+): Promise<SyncReport> {
   const report: SyncReport = {
     tradesInserted: 0,
     transfersInserted: 0,
     duplicatesSkipped: 0,
     errors: [],
-  }
-
-  if (options.connectionType !== 'exchange' || !options.exchange || !options.credentials) {
-    report.errors.push('Wallet sync not yet implemented')
-    return report
   }
 
   const adapter = getExchangeAdapter(options.exchange)
@@ -79,6 +97,69 @@ export async function syncConnection(
   // Update connection status and cursor
   await supabase
     .from('exchange_connections')
+    .update({
+      last_sync_at: new Date().toISOString(),
+      sync_cursor: report.newCursor ?? {},
+      status: report.errors.length > 0 ? 'error' : 'active',
+      error_message: report.errors.length > 0 ? report.errors.join('; ') : null,
+    })
+    .eq('id', options.connectionId)
+
+  return report
+}
+
+async function syncWalletConnection(
+  supabase: SupabaseClient,
+  options: WalletSyncOptions
+): Promise<SyncReport> {
+  const report: SyncReport = {
+    tradesInserted: 0,
+    transfersInserted: 0,
+    duplicatesSkipped: 0,
+    errors: [],
+  }
+
+  const adapter = getChainAdapter(options.chain)
+
+  try {
+    const { transactions, nextCursor } = await adapter.fetchTransactions(
+      options.address,
+      options.cursor
+    )
+
+    for (const tx of transactions) {
+      // Convert chain transaction to RawTransfer shape for the normalizer
+      const normalized = normalizeTransfer(
+        {
+          externalId: tx.txHash,
+          timestamp: tx.timestamp,
+          asset: tx.asset,
+          amount: tx.amount,
+          type: tx.type === 'incoming' ? 'deposit' : 'withdrawal',
+          fromAddress: tx.fromAddress,
+          toAddress: tx.toAddress,
+          txHash: tx.txHash,
+          feeAmount: tx.fee,
+          feeAsset: tx.feeAsset,
+          rawData: tx.rawData,
+        },
+        options.connectionId,
+        'wallet'
+      )
+
+      const result = await upsertTransaction(supabase, options.orgId, tx.rawData, normalized)
+      if (result === 'inserted') report.transfersInserted++
+      else if (result === 'duplicate') report.duplicatesSkipped++
+    }
+
+    report.newCursor = nextCursor
+  } catch (err) {
+    report.errors.push(`Wallet sync failed: ${err instanceof Error ? err.message : String(err)}`)
+  }
+
+  // Update wallet connection status and cursor
+  await supabase
+    .from('wallet_connections')
     .update({
       last_sync_at: new Date().toISOString(),
       sync_cursor: report.newCursor ?? {},

@@ -128,7 +128,10 @@ export async function GET(request: NextRequest) {
       const report = await syncConnection(supabase, {
         connectionId: connection.id,
         connectionType: 'wallet',
+        chain: connection.chain,
+        address: connection.address,
         orgId: connection.org_id,
+        cursor: connection.sync_cursor ?? undefined,
       })
 
       if (report.errors.length > 0) {

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getSecret } from '@/lib/supabase/vault'
+import { syncConnection } from '@/lib/sync'
+import { ExchangeName } from '@/types/exchange'
+import { ChainName } from '@/types/blockchain'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -39,13 +43,67 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Connection not found' }, { status: 404 })
     }
 
-    // TODO: Retrieve API keys from Supabase Vault and run sync
-    // For now, return a message that Vault needs to be configured
-    return NextResponse.json({
-      error: 'Sync requires Supabase Vault configuration for API key storage. Set up Vault to enable syncing.',
-      connection: connection
-    }, { status: 501 })
+    if (!connection.api_key_id || !connection.api_secret_id) {
+      return NextResponse.json({
+        error: 'Connection is missing API credentials. Please reconnect with valid API keys.',
+      }, { status: 400 })
+    }
+
+    // Retrieve API credentials from Vault
+    let apiKey: string
+    let apiSecret: string
+    let passphrase: string | undefined
+
+    try {
+      apiKey = await getSecret(connection.api_key_id)
+      apiSecret = await getSecret(connection.api_secret_id)
+
+      if (connection.passphrase_id) {
+        passphrase = await getSecret(connection.passphrase_id)
+      }
+    } catch (err) {
+      return NextResponse.json({
+        error: `Failed to retrieve credentials: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      }, { status: 500 })
+    }
+
+    // Run sync
+    const report = await syncConnection(supabase, {
+      connectionId,
+      connectionType: 'exchange',
+      exchange: connection.exchange as ExchangeName,
+      credentials: { apiKey, apiSecret, passphrase },
+      orgId: membership.org_id,
+      cursor: connection.sync_cursor as Record<string, unknown> | undefined,
+    })
+
+    return NextResponse.json({ report })
   }
 
-  return NextResponse.json({ error: 'Wallet sync not yet implemented' }, { status: 501 })
+  if (connectionType === 'wallet') {
+    const { data: connection } = await supabase
+      .from('wallet_connections')
+      .select('*')
+      .eq('id', connectionId)
+      .eq('org_id', membership.org_id)
+      .single()
+
+    if (!connection) {
+      return NextResponse.json({ error: 'Wallet connection not found' }, { status: 404 })
+    }
+
+    // Wallet adapters use public APIs — no Vault keys needed
+    const report = await syncConnection(supabase, {
+      connectionId,
+      connectionType: 'wallet',
+      chain: connection.chain as ChainName,
+      address: connection.address,
+      orgId: membership.org_id,
+      cursor: connection.sync_cursor as Record<string, unknown> | undefined,
+    })
+
+    return NextResponse.json({ report })
+  }
+
+  return NextResponse.json({ error: 'Invalid connectionType' }, { status: 400 })
 }

@@ -19,37 +19,37 @@ const features = [
     icon: Zap,
     title: 'Exchange & Wallet Sync',
     description:
-      'Connect Coinbase, Binance, Kraken, Gemini, and on-chain wallets. Transactions flow in automatically.',
+      'Pulls trades from Coinbase, Binance, Kraken, and Gemini via API. Grabs on-chain transactions too. No CSV uploads.',
   },
   {
     icon: Tags,
     title: 'Auto-Categorization',
     description:
-      'Deterministic rules classify buys, sells, transfers, staking rewards, and fees without manual tagging.',
+      'Buys, sells, transfers, staking rewards, fees — tagged automatically by deterministic rules. You fix edge cases, not everything.',
   },
   {
     icon: Calculator,
     title: 'FIFO Cost Basis',
     description:
-      'Per-wallet FIFO calculations that handle transfers between your own wallets correctly.',
+      'Per-wallet FIFO that actually handles transfers between your own wallets without double-counting. The thing spreadsheets get wrong.',
   },
   {
     icon: FileCheck,
     title: '1099-DA Reconciliation',
     description:
-      'Import broker 1099-DAs, match against your records, and surface discrepancies before filing.',
+      'Upload your broker 1099-DAs, match them against your records, and see exactly where they disagree. Before you file.',
   },
   {
     icon: BarChart3,
     title: 'Position & P&L Reports',
     description:
-      'Real-time portfolio views, realized/unrealized gains, and period-over-period performance.',
+      'See your positions, realized and unrealized gains, and performance by period. The stuff your LPs actually ask for.',
   },
   {
     icon: FileSpreadsheet,
     title: 'GL Export',
     description:
-      'Map transactions to your chart of accounts and export journal entries to QuickBooks or Xero.',
+      'Map to your chart of accounts and push journal entries straight to QuickBooks or Xero. No re-keying.',
   },
 ]
 
@@ -57,35 +57,35 @@ const steps = [
   {
     number: '01',
     icon: Link2,
-    title: 'Connect your exchanges and wallets',
+    title: 'Plug in your exchanges and wallets',
     description:
-      'Add API keys for your exchanges and wallet addresses. Encrypted at rest via Supabase Vault.',
+      'Add API keys and wallet addresses. Keys are encrypted at rest — we never see them in plaintext.',
   },
   {
     number: '02',
     icon: ListOrdered,
-    title: 'Sync and categorize transactions',
+    title: 'Everything gets pulled and sorted',
     description:
-      'Fundkeeper pulls your full history, deduplicates across sources, and auto-categorizes every transaction.',
+      'Your full transaction history syncs in, gets deduplicated, and auto-categorized. You review, not rebuild.',
   },
   {
     number: '03',
     icon: FileOutput,
-    title: 'Export reports to your GL',
+    title: 'Export to your GL and file',
     description:
-      'Generate cost basis reports, reconcile 1099-DAs, and push journal entries to your general ledger.',
+      'Cost basis reports, 1099-DA reconciliation, journal entries to QuickBooks or Xero. Done.',
   },
 ]
 
 const includedFeatures = [
-  'Unlimited exchange & wallet connections',
-  'Full transaction history sync',
-  'Auto-categorization engine',
+  'All exchanges and wallets, no limits',
+  'Full transaction history, not just recent',
+  'Auto-categorization for every transaction',
   'Per-wallet FIFO cost basis',
-  '1099-DA reconciliation',
-  'Position & P&L reports',
-  'QuickBooks & Xero GL export',
-  'Email support',
+  '1099-DA matching and discrepancy reports',
+  'Position and P&L reports',
+  'GL export to QuickBooks and Xero',
+  'Email support from people who get crypto accounting',
 ]
 
 export default function LandingPage() {
@@ -111,11 +111,11 @@ export default function LandingPage() {
         <section className="px-6 pt-24 pb-20 sm:pt-32 sm:pb-28">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Back office for emerging crypto funds
+              Your fund&apos;s books. Done.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              Sync exchanges, track cost basis, reconcile 1099-DAs, and export to your GL
-              — all in one place.
+              Crypto fund accounting for managers who&apos;d rather run their fund than
+              fight spreadsheets at quarter-end.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link href="/signup">
@@ -137,26 +137,26 @@ export default function LandingPage() {
         <section className="border-y bg-muted/50 px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-2xl font-medium tracking-tight sm:text-3xl">
-              Managing a crypto fund&apos;s books shouldn&apos;t require 5 spreadsheets
-              and 3 consultants.
+              You know the drill. Five spreadsheets, three consultants,
+              and you&apos;re still not sure the numbers are right.
             </p>
             <div className="mt-12 grid gap-8 sm:grid-cols-3">
               <div>
                 <div className="text-3xl font-bold">5+</div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Spreadsheets to reconcile across exchanges and wallets
+                  spreadsheets duct-taped together across exchanges and wallets
                 </p>
               </div>
               <div>
                 <div className="text-3xl font-bold">40hrs</div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Per quarter spent on manual cost basis calculations
+                  every quarter on cost basis math that should be automatic
                 </p>
               </div>
               <div>
                 <div className="text-3xl font-bold">$$$</div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Paid to consultants for work software should handle
+                  to consultants for work that belongs in software
                 </p>
               </div>
             </div>
@@ -168,11 +168,11 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                Everything you need to close the books
+                What it actually does
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-                Purpose-built for crypto fund managers who need audit-ready records without
-                the overhead.
+                Built for funds in the $5-50M range who need real books, not another
+                dashboard.
               </p>
             </div>
             <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -196,10 +196,11 @@ export default function LandingPage() {
           <div className="mx-auto max-w-4xl">
             <div className="text-center">
               <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                How it works
+                Three steps. That&apos;s it.
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-                From connected accounts to GL entries in three steps.
+                Connected accounts to journal entries. No onboarding calls, no
+                implementation timeline.
               </p>
             </div>
             <div className="mt-14 grid gap-10 sm:grid-cols-3">
@@ -225,10 +226,11 @@ export default function LandingPage() {
         <section className="px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Simple pricing
+              Free while we build
             </h2>
             <p className="mt-4 text-muted-foreground">
-              One plan. Everything included. No surprises.
+              We&apos;re in beta. Everything&apos;s included. You help us find the
+              rough edges, we give you the product for free.
             </p>
           </div>
           <div className="mx-auto mt-12 max-w-md rounded-xl border bg-card p-8">
@@ -264,10 +266,10 @@ export default function LandingPage() {
         <section className="border-t bg-muted/50 px-6 py-20 sm:py-24">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Stop wrestling with spreadsheets.
+              Close the books this quarter without the fire drill.
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Join the beta and get your fund&apos;s back office running in minutes.
+              Set up takes about 10 minutes. The beta is free.
             </p>
             <div className="mt-8">
               <Link href="/signup">

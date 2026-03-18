@@ -12,7 +12,10 @@ import {
   FileOutput,
   Settings,
   LogOut,
+  Sun,
+  Moon,
 } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -32,6 +35,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const { theme, setTheme } = useTheme()
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -68,6 +72,15 @@ export function Sidebar() {
         })}
       </nav>
       <div className="border-t p-2">
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/50"
+        >
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:hidden" />
+          <Moon className="hidden h-4 w-4 transition-all dark:block" />
+          <span className="dark:hidden">Dark mode</span>
+          <span className="hidden dark:block">Light mode</span>
+        </button>
         <button
           onClick={handleSignOut}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/50"
