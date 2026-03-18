@@ -26,18 +26,18 @@ export async function GET(request: NextRequest) {
   const { data: exchangeConnections, error: exchangeError } = await supabase
     .from('exchange_connections')
     .select('*')
-    .eq('status', 'active')
+    .in('status', ['active', 'pending'])
 
   if (exchangeError) {
     console.error('[cron-sync] Failed to fetch exchange connections:', exchangeError.message)
     return NextResponse.json({ error: 'Failed to fetch exchange connections' }, { status: 500 })
   }
 
-  // Fetch all active wallet connections
+  // Fetch all active/pending wallet connections
   const { data: walletConnections, error: walletError } = await supabase
     .from('wallet_connections')
     .select('*')
-    .eq('status', 'active')
+    .in('status', ['active', 'pending'])
 
   if (walletError) {
     console.error('[cron-sync] Failed to fetch wallet connections:', walletError.message)
