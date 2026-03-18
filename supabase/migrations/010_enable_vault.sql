@@ -1,6 +1,7 @@
 -- Enable Vault extensions
-create extension if not exists pgsodium with schema pgsodium;
-create extension if not exists supabase_vault with schema vault;
+-- Supabase manages pgsodium schema automatically
+create extension if not exists pgsodium;
+-- supabase_vault is pre-installed on Supabase hosted projects
 
 -- Function to retrieve decrypted API credentials for a connection
 -- Used by the cron sync job
